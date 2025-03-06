@@ -28,7 +28,7 @@ Ensure you have the following installed and configured:
 Neon provides a **DATABASE_URL** containing all necessary connection details (host, user, password, database).
 
 - **Example Non-Pooled DATABASE_URL:**
-postgresql://<USERNAME>:<PASSWORD>@<HOSTNAME>/<DATABASE>?sslmode=require
+"postgresql://<USERNAME>:<PASSWORD>@<HOSTNAME>/<DATABASE>?sslmode=require"
 
 pgsql
 Copy
