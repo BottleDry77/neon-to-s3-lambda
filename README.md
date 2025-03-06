@@ -28,8 +28,9 @@ Ensure you have the following installed and configured:
 Neon provides a **DATABASE_URL** containing all necessary connection details (host, user, password, database).
 
 - **Example Non-Pooled DATABASE_URL:**
+```sh
 postgresql://<USERNAME>:<PASSWORD>@<HOSTNAME>/<DATABASE>?sslmode=require
-
+```
 
 ⚠ **Important Notes:**  
 - Use the **"Non-Pooled"** connection string for backups.  
