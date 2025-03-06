@@ -2,7 +2,7 @@
 __pycache__/
 *.pyc
 *.pyo
-README.txt
+
 # Ignore Docker build files
 *.log
 *.env
