@@ -1,0 +1,9 @@
+# Ignore Python cache
+__pycache__/
+*.pyc
+*.pyo
+README.txt
+# Ignore Docker build files
+*.log
+*.env
+docker-compose.yml
