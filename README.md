@@ -46,6 +46,7 @@ Edit
 
 ### **Option 1: Using the Public ECR Image (Recommended)**
 *(Once available, replace `<public-ecr-url>` with the correct URI)*  
+
 1️⃣ **Create the Lambda Function**  
 ```sh
 aws lambda create-function \
@@ -55,9 +56,6 @@ aws lambda create-function \
 --role <IAM_ROLE_ARN>
 2️⃣ Set Environment Variables
 
-sh
-Copy
-Edit
 aws lambda update-function-configuration \
   --function-name NeonDBBackup \
   --environment "Variables={DATABASE_URL=<your-neon-db-url>,S3_BUCKET=<your-s3-bucket>,S3_PREFIX=dbBackup/}"
@@ -69,40 +67,27 @@ Edit
 aws lambda invoke --function-name NeonDBBackup response.json
 ✅ Your Lambda function is now deployed and will back up your Neon PostgreSQL database to S3.
 
+
+
 Option 2: Build and Deploy Your Own ECR Image
 (If you prefer to build and push your own Docker image instead of using the public one.)
 
 1️⃣ Clone this Repository
 
-sh
-Copy
-Edit
 git clone https://github.com/<your-repo>/neon-db-backup-lambda.git
 cd neon-db-backup-lambda
 2️⃣ Build the Docker Image
 
-sh
-Copy
-Edit
 docker build -t neon-db-backup .
 3️⃣ Authenticate Docker with AWS ECR
 
-sh
-Copy
-Edit
 aws ecr get-login-password --region <aws-region> | docker login --username AWS --password-stdin <AWS_ACCOUNT_ID>.dkr.ecr.<aws-region>.amazonaws.com
 4️⃣ Tag and Push to ECR
 
-sh
-Copy
-Edit
 docker tag neon-db-backup:latest <AWS_ACCOUNT_ID>.dkr.ecr.<aws-region>.amazonaws.com/neon-db-backup:latest
 docker push <AWS_ACCOUNT_ID>.dkr.ecr.<aws-region>.amazonaws.com/neon-db-backup:latest
 5️⃣ Create the Lambda Function
 
-sh
-Copy
-Edit
 aws lambda create-function \
   --function-name NeonDBBackup \
   --package-type Image \
@@ -110,17 +95,11 @@ aws lambda create-function \
   --role <IAM_ROLE_ARN>
 6️⃣ Set Environment Variables
 
-sh
-Copy
-Edit
 aws lambda update-function-configuration \
   --function-name NeonDBBackup \
   --environment "Variables={DATABASE_URL=<your-neon-db-url>,S3_BUCKET=<your-s3-bucket>,S3_PREFIX=dbBackup/}"
 7️⃣ Trigger the Function Manually
 
-sh
-Copy
-Edit
 aws lambda invoke --function-name NeonDBBackup response.json
 ✅ Your Lambda function is now deployed and ready to use!
 
@@ -130,9 +109,6 @@ aws lambda invoke --function-name NeonDBBackup response.json
 Option 1: Using the Public ECR Image
 (Once available, replace <public-ecr-url> with the correct URI)
 
-sh
-Copy
-Edit
 aws lambda update-function-code \
   --function-name NeonDBBackup \
   --image-uri <public-ecr-url>:latest
@@ -149,42 +125,29 @@ Edit
 docker build -t neon-db-backup .
 3️⃣ Tag and Push the Updated Image
 
-sh
-Copy
-Edit
 docker tag neon-db-backup:latest <AWS_ACCOUNT_ID>.dkr.ecr.<aws-region>.amazonaws.com/neon-db-backup:latest
 docker push <AWS_ACCOUNT_ID>.dkr.ecr.<aws-region>.amazonaws.com/neon-db-backup:latest
 4️⃣ Update the Lambda Function
 
-sh
-Copy
-Edit
 aws lambda update-function-code \
   --function-name NeonDBBackup \
   --image-uri <AWS_ACCOUNT_ID>.dkr.ecr.<aws-region>.amazonaws.com/neon-db-backup:latest
 5️⃣ Verify Deployment
 
-sh
-Copy
-Edit
 aws lambda get-function-configuration --function-name NeonDBBackup --query "Code.ImageUri"
 6️⃣ Invoke the Function
 
-sh
-Copy
-Edit
 aws lambda invoke --function-name NeonDBBackup response.json
 7️⃣ Check CloudWatch Logs for Errors
 
-sh
-Copy
-Edit
 aws logs tail /aws/lambda/NeonDBBackup --follow
 📁 Checking Backup Files in S3
 After a successful run, backups should appear in S3.
 To list them:
 
-sh
-Copy
-Edit
 aws s3 ls s3://<your-s3-bucket>/<your-s3-prefix> --human-readable --summarize
+
+
+
+
+
