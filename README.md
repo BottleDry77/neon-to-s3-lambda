@@ -22,7 +22,8 @@ Ensure you have the following installed and configured:
 ✅ **AWS CLI** (for deploying and managing AWS resources)  
 ✅ **S3 Bucket** (where backups will be stored)  
 ✅ **S3 Prefix** *(optional, defaults to `"dbBackup/"` if not defined.)*  
-✅ **Neon PostgreSQL Connection String** (DATABASE_URL)  
+✅ **Neon PostgreSQL Connection String** (DATABASE_URL)
+✅ **Update <your-s3-bucket> in S3-policy.json with S3 Bucket name**    
 
 ### **Neon PostgreSQL Credentials (DATABASE_URL)**
 Neon provides a **DATABASE_URL** containing all necessary connection details (host, user, password, database).
@@ -35,7 +36,31 @@ postgresql://<USERNAME>:<PASSWORD>@<HOSTNAME>/<DATABASE>?sslmode=require
 ⚠ **Important Notes:**  
 - Use the **"Non-Pooled"** connection string for backups.  
 - **Ensure `"sslmode=require"` is present** for a secure connection.  
-- The full **DATABASE_URL should be stored in the Lambda environment variables** under `DATABASE_URL` in the AWS Lambda console.
+- The full **DATABASE_URL should be stored in the Lambda environment variables** under `DATABASE_URL`.
+  (AWS Systems Manager Parameter Store and AWS Secrets Manager are alternative options for securely storing credentials but are not discussed here.)
+
+---
+
+# **Creating the IAM Role**
+```sh
+aws iam create-role --role-name LambdaNeonBackupRole --assume-role-policy-document file://trust-policy.json
+```
+Attach Policies
+
+```sh
+aws iam attach-role-policy --role-name LambdaNeonBackupRole --policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+```
+```sh
+aws iam put-role-policy --role-name LambdaNeonBackupRole --policy-name S3BackupPolicy --policy-document file://s3-policy.json
+```
+```sh
+aws iam attach-role-policy --role-name LambdaNeonBackupRole --policy-arn arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+```
+Attach IAM Role to Lambda
+
+```sh
+aws lambda update-function-configuration --function-name NeonDBBackup --role arn:aws:iam::<AWS_ACCOUNT_ID>:role/LambdaNeonBackupRole
+```
 
 ---
 
@@ -145,12 +170,13 @@ aws lambda invoke --function-name NeonDBBackup response.json
 ```sh
 aws logs tail /aws/lambda/NeonDBBackup --follow
 ```
+
+---
+
 ***📁 Checking Backup Files in S3***
 After a successful run, backups should appear in S3.
 To list them:
 ```sh
 aws s3 ls s3://<your-s3-bucket>/<your-s3-prefix> --human-readable --summarize
 ```
-
-
 
