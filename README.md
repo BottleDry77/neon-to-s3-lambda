@@ -111,7 +111,7 @@ aws lambda invoke --function-name NeonDBBackup response.json
 # 🔄 **Updating an Existing Deployment**
 *(For users who have already deployed the their own Docker-Lambda function and need to update it.)*
 
-Pushing an Updated Custom Image
+**Pushing an Updated Custom Image**
 
 1️⃣ Modify lambda_function.py
 
@@ -145,7 +145,7 @@ aws lambda invoke --function-name NeonDBBackup response.json
 ```sh
 aws logs tail /aws/lambda/NeonDBBackup --follow
 ```
-📁 Checking Backup Files in S3
+***📁 Checking Backup Files in S3***
 After a successful run, backups should appear in S3.
 To list them:
 ```sh
