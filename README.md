@@ -107,8 +107,9 @@ aws lambda invoke --function-name NeonDBBackup response.json
 ```
 ✅ Your Lambda function is now deployed and ready to use!
 
-🔄 Updating an Existing Deployment
-(For users who have already deployed the Lambda function and need to update it.)
+---
+# 🔄 Updating an Existing Deployment **
+*(For users who have already deployed the Lambda function and need to update it.)*
 
 Option 2: Pushing an Updated Custom Image
 
