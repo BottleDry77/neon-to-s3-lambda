@@ -186,7 +186,7 @@ aws s3 ls s3://<your-s3-bucket>/<your-s3-prefix> --human-readable --summarize
 ```sh
 aws events put-rule \
   --name NeonDBBackupSchedule \
-  --schedule-expression "rate(24 hours)"
+  --schedule-expression "cron(0 10 * * ? *)"
 ```
 🔹 Step 2: Grant EventBridge Permission to Invoke Lambda
 ```sh
