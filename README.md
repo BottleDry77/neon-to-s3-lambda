@@ -56,15 +56,11 @@ aws iam put-role-policy --role-name LambdaNeonBackupRole --policy-name S3BackupP
 ```sh
 aws iam attach-role-policy --role-name LambdaNeonBackupRole --policy-arn arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
 ```
-Attach IAM Role to Lambda
 
-```sh
-aws lambda update-function-configuration --function-name NeonDBBackup --role arn:aws:iam::<AWS_ACCOUNT_ID>:role/LambdaNeonBackupRole
-```
 
 ---
 
-# 🚀 **Initial Deployment (For New Users)**  
+# 🚀 **Initial Deployment**  
 *(If you are already using the Lambda function and only need to update it, skip to the next section.)*  
 
 ### **Option 1: Using the Public ECR Image (Recommended)**
@@ -126,7 +122,12 @@ aws lambda update-function-configuration \
   --function-name NeonDBBackup \
   --environment "Variables={DATABASE_URL=<your-neon-db-url>,S3_BUCKET=<your-s3-bucket>,S3_PREFIX=dbBackup/}"
 ```
-7️⃣ Trigger the Function Manually
+7️ Attach IAM Role to Lambda
+```sh
+aws lambda update-function-configuration --function-name NeonDBBackup --role arn:aws:iam::<AWS_ACCOUNT_ID>:role/LambdaNeonBackupRole
+```
+
+8️⃣ Trigger the Function Manually
 ```sh
 aws lambda invoke --function-name NeonDBBackup response.json
 ```
@@ -179,4 +180,31 @@ To list them:
 ```sh
 aws s3 ls s3://<your-s3-bucket>/<your-s3-prefix> --human-readable --summarize
 ```
-
+---
+#⏳ **Automating Backups with EventBridge**
+🔹 Step 1: Create a New EventBridge Rule
+```sh
+aws events put-rule \
+  --name NeonDBBackupSchedule \
+  --schedule-expression "rate(24 hours)"
+```
+🔹 Step 2: Grant EventBridge Permission to Invoke Lambda
+```sh
+aws lambda add-permission \
+  --function-name NeonDBBackup \
+  --statement-id EventBridgeInvoke \
+  --action "lambda:InvokeFunction" \
+  --principal events.amazonaws.com \
+  --source-arn arn:aws:events:<aws-region>:<aws-account-id>:rule/NeonDBBackupSchedule
+```
+🔹 Step 3: Attach the Rule to the Lambda Function
+```sh
+aws events put-targets \
+  --rule NeonDBBackupSchedule \
+  --targets "Id"="1","Arn"="arn:aws:lambda:<aws-region>:<aws-account-id>:function:NeonDBBackup"
+  ```
+✅ Done!
+To verify, list existing rules:
+```sh
+aws events list-rules
+```
